@@ -2,7 +2,7 @@
 
 ## Présentation
 
-Le [syllabus](cours/syllabus.pdf) (résumé) du module est disponible.
+Le [syllabus](cours/syllabus-progsync.pdf) (résumé) du module est disponible.
 
 ### Contenu et objectifs
 
