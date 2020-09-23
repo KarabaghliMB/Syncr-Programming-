@@ -1,0 +1,8 @@
+#+TITLE: Programmation synchrone 2020/2021 -- M2 Informatique & EIDD
+#+AUTHOR: Adrien Guatto
+#+EMAIL: guatto@irif.org
+#+LANGUAGE: fr
+#+OPTIONS: ^:nil p:nil
+
+Ce fichier contient le journal du cours. Il fait référence aux
+[notes](notes-de-cours-progsync.pdf).

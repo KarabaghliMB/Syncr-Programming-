@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+# Functions
+
+VERBOSE=0
+
+binary_exists() {
+    if ! command -v $1 &> /dev/null
+    then
+        cat <<EOF
+Command "$1" could not be found in \$PATH.
+Hint: $2
+EOF
+        exit 1
+    fi
+}
+
+help() {
+    cat <<EOF >&2
+Usage: $0 [OPTIONS] file.ept
+Options:
+        -s <node_name>       Simulate node <node_name>
+        -c                   Check for required tools
+        -v                   Print internal information
+EOF
+}
+
+info() {
+    if [ $VERBOSE -ne 0 ]; then echo $1; fi
+}
+
+cmd() {
+    if [ $VERBOSE -ne 0 ]; then echo $1; fi
+    command $1
+}
+
+# Entry point
+
+if [ $# -lt 1 ]
+then
+    exit 1
+fi
+
+VERBOSE=0
+NODES=""
+
+while getopts "vs:h" OPT
+do
+    case "${OPT}" in
+        v)
+            VERBOSE=1
+            ;;
+        s)
+            NODES="${NODES} ${OPTARG}"
+            ;;
+        h)
+            help
+            exit 0
+            ;;
+        c)
+            binary_exists "heptc" "opam install heptagon"
+            binary_exists "hepts" "opam install heptagon"
+            binary_exists "gcc" "use the package manager of your Linux distro"
+            ;;
+        ?)
+            help
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ $# -lt 1 ]
+then
+    help
+    exit 1
+fi
+
+CDIR=`pwd`
+FILE=$1
+TMPDIR=`mktemp -d`
+BASENAME=`basename $1 .ept`
+MOD=${BASENAME^}
+BIN=$BASENAME.bin
+
+info "Entering temporary dir $TMPDIR"
+
+cp $FILE $TMPDIR
+cd $TMPDIR
+
+for NODE in $NODES
+do
+    info "Simulating node $NODE in $FILE"
+
+    cmd "heptc -target c -s $NODE -hepts $FILE"
+    if [ $? -ne 0 ]; then exit 1; fi
+
+    cd ${BASENAME}_c
+    cmd "gcc -Wall -I `heptc -where`/c *.c -o ../$BIN"
+    if [ $? -ne 0 ]
+    then
+        echo "Could not compile the generated C code in $TMPDIR" >&2
+        exit 1
+    fi
+    cd ..
+
+    info "Running simulation of $NODE"
+    cmd "hepts -mod $MOD -node $NODE -exec "`realpath $TMPDIR/$BIN`""
+    if [ $? -ne 0 ]; then echo "Could not simulate node $NODE" >&2; exit 1; fi
+done
+
+info "Finished simulation"
