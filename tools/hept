@@ -29,6 +29,11 @@ info() {
     if [ $VERBOSE -ne 0 ]; then echo $1; fi
 }
 
+die() {
+    echo -e "\e[31m$1\e[0m" >&2
+    exit 1
+}
+
 cmd() {
     if [ $VERBOSE -ne 0 ]; then echo $1; fi
     command $1
@@ -94,18 +99,20 @@ do
     cmd "heptc -target c -s $NODE -hepts $FILE"
     if [ $? -ne 0 ]; then exit 1; fi
 
-    cd ${BASENAME}_c
+    DIRN=${BASENAME//-/lex45_}_c
+    [ -d ${DIRN} ] || die "Could not find directory ${DIRN}"
+
+    cd ${DIRN}
     cmd "gcc -Wall -I `heptc -where`/c *.c -o ../$BIN"
     if [ $? -ne 0 ]
     then
-        echo "Could not compile the generated C code in $TMPDIR" >&2
-        exit 1
+        die "Could not compile the generated C code in $TMPDIR"
     fi
     cd ..
 
     info "Running simulation of $NODE"
     cmd "hepts -mod $MOD -node $NODE -exec "`realpath $TMPDIR/$BIN`""
-    if [ $? -ne 0 ]; then echo "Could not simulate node $NODE" >&2; exit 1; fi
+    if [ $? -ne 0 ]; then die "Could not simulate node $NODE"; fi
 done
 
 info "Finished simulation"

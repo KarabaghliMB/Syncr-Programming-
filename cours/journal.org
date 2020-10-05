@@ -6,3 +6,8 @@
 
 Ce fichier contient le journal du cours. Il fait référence aux
 [notes](notes-de-cours-progsync.pdf).
+
+* Cours 01 <2020-09-29>
+  Ce cours a traité des notes de cours, de Introduction à Premiers programmes
+  inclus. On a même été un peu au delà, avec un premier exemple bref de noeud
+  Heptagon séquentiel (à état non-trivial).

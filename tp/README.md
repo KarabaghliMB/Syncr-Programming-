@@ -15,10 +15,12 @@ veuillez vous référer à la section ci-dessous.
 ## Installation d'Heptagon
 
 La façon la plus simple d'installer Heptagon sur votre machine est via OPAM, le
-gestionnaire de paquets OCaml.
+gestionnaire de paquets OCaml. L'installation de la bibliothèque graphique
+LablGTK, qui permet d'obtenir le simulateur graphique `hepts`, est fortement
+recommandée.
 
 ``
-opam install heptagon
+opam install lablgtk heptagon
 ``
 
 Pour installer OCaml et OPAM, référez-vous aux instructions de votre
