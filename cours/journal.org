@@ -14,3 +14,7 @@ Ce fichier contient le journal du cours. Il fait référence aux
 * Cours 02 <2020-10-06>
   Cette séance a traité des notes de cours, deuxième section, jusqu'à
   "Causalité" inclus.
+* Cours 03 <2020-10-13>
+  Cette séance a couvert la deuxième section des notes de cours, jusqu'au début
+  de la section "automates". En revanche, les règles du calcul d'horloge et
+  l'exemple de l'intégrateur n'ont pas été traités.
