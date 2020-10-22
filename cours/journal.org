@@ -18,3 +18,9 @@ Ce fichier contient le journal du cours. Il fait référence aux
   Cette séance a couvert la deuxième section des notes de cours, jusqu'au début
   de la section "automates". En revanche, les règles du calcul d'horloge et
   l'exemple de l'intégrateur n'ont pas été traités.
+* Cours 04 <2020-10-20>
+  On a commencé par revenir sur les horloges discutées lors du cours 3, en
+  discutant des règles qui dictent si une expression est correcte du point de
+  vue des horloges, puis en présentant un exemple (un intégrateur désactivable).
+  On a ensuite détaillé le fonctionnement des automates (types de transition,
+  mémoires ~last~) comme dans les notes de cours.
