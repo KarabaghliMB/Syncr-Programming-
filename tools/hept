@@ -87,7 +87,7 @@ do
             exit 0
             ;;
         m)
-            MAXSTEP=$(expr ${OPTARG} + 1)
+            MAXSTEP=$(expr ${OPTARG})
             ;;
         ?)
             help

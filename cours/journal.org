@@ -24,3 +24,6 @@ Ce fichier contient le journal du cours. Il fait référence aux
   vue des horloges, puis en présentant un exemple (un intégrateur désactivable).
   On a ensuite détaillé le fonctionnement des automates (types de transition,
   mémoires ~last~) comme dans les notes de cours.
+* Cours 05 <2020-10-27>
+  On a convert la sous-section sur les tableaux, en s'arrêtant avant la
+  concaténation et les itérateurs.
