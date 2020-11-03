@@ -37,11 +37,12 @@ le cours.
 
 ## Structuration du cours
 
-Le cours magistral a lieu le *mardi de 10h30 à 12h30*, dans l'*amphithéâtre 4C*
-de la Halle aux Farines.
+Le cours magistral a lieu le *mardi de 10h30 à 12h30*, ~~dans l'amphithéâtre 4C
+de la Halle aux Farines~~ en ligne, sur [un serveur
+Discord](https://discord.gg/69Re3Mg4U8) dédié.
 
-Les séances de travaux pratiques ont lieu en *salle 2001* du bâtiment Sophie
-Germain, à deux horaires différents :
+Les séances de travaux pratiques ont lieu en ~~salle 2001 du bâtiment Sophie
+Germain~~ ligne, à deux horaires différents :
 
 - pour les étudiants de Master 2, le *mardi de 8h30 à 10h30*,
 
