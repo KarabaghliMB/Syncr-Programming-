@@ -27,3 +27,7 @@ Ce fichier contient le journal du cours. Il fait référence aux
 * Cours 05 <2020-10-27>
   On a convert la sous-section sur les tableaux, en s'arrêtant avant la
   concaténation et les itérateurs.
+* Cours 06 <2020-11-03>
+  On a couvert la sous-section "itérateurs" de la section des notes de cours qui
+  concerne les tableaux. Ensuite, on a discuté de synthèse audio en Heptagon,
+  cf. le sous-dossier [[file:audio/][audio]].
