@@ -6,6 +6,7 @@
 #include <sndfile.h>
 
 #include "audio.h"
+#include "vcd.h"
 
 const size_t sample_rate = Audio__period;
 
@@ -15,12 +16,6 @@ void die(const char *message) {
 }
 
 SNDFILE *file_out = NULL;
-
-void cleanup_on_exit() {
-  if (file_out)
-    sf_close(file_out);
-  SDL_Quit();
-}
 
 int main(int argc, char** argv)
 {
@@ -35,7 +30,7 @@ int main(int argc, char** argv)
   const char *filename = NULL;
   Uint32 buffered;
 
-  while ((opt = getopt(argc, argv, "ho:qm:")) != -1) {
+  while ((opt = getopt(argc, argv, "ho:qm:t:")) != -1) {
     switch (opt) {
     case 'h':
       printf("Usage: %s OPTIONS\n", argv[0]);
@@ -43,6 +38,7 @@ int main(int argc, char** argv)
       printf("  -o <file.wav>   write samples to <file.wav>\n");
       printf("  -q              do not play sound\n");
       printf("  -m <sec>        play for <sec> seconds\n");
+      printf("  -t <file.vcd>   dump traces in <file.vcd>\n");
       printf("  -h              display this message\n");
       return 0;
     case 'q':
@@ -54,13 +50,14 @@ int main(int argc, char** argv)
     case 'm':
       max_sec = atoi(optarg);
       break;
+    case 't':
+      hept_vcd_init(optarg, VCD_TIME_UNIT_US, 20);
+      break;
     default:
       fprintf(stderr, "Unknown option '%c'\n", opt);
       exit(EXIT_FAILURE);
     }
   }
-
-  Audio__main_reset(&mem);
 
   if (SDL_Init(SDL_INIT_AUDIO) < 0)
     die("Could not initialize SDL2\n");
@@ -87,8 +84,7 @@ int main(int argc, char** argv)
     }
   }
 
-  atexit(cleanup_on_exit);
-
+  Audio__main_reset(&mem);
   float *buffer = calloc(spec.samples, sizeof *buffer);
   SDL_PauseAudioDevice(dev, 0);
   for (size_t samples = 0;
@@ -121,12 +117,15 @@ int main(int argc, char** argv)
   printf("\n");
 
   /* Wait until the audio buffer is empty. */
-  printf("Flushing audio queue... "); fflush(stdout);
+  printf("Waiting for queue flush... "); fflush(stdout);
   while ((buffered = SDL_GetQueuedAudioSize(dev)) != 0)
     SDL_Delay(50);
   printf("done.\n");
 
   free(buffer);
+  if (file_out)
+    sf_close(file_out);
+  SDL_Quit();
 
   return 0;
 }

@@ -314,14 +314,63 @@ let
   c = periodic(period) = 0;
 tel
 
-node midi_piano<<n : int>>(keys : int^2^n; time : int^n) returns (o : stereo)
-var i, j : int; next : bool; duree_mesure : int;
+(* On peut essayer de programmer un piano midi. *)
+
+(* Pour générer des transitions propres entre les notes, on a besoin de modifier
+   nos tons à travers une "enveloppe". La plus classique est l'enveloppe dite
+   "Attack-Decay-Sustain-Release", cf. Wikipédia.
+
+   https://en.wikipedia.org/wiki/Envelope_(music)#ADSR
+
+   Le noeud ci-dessous produit une telle enveloppe périodiquement, tous les t
+   instants. L'enveloppe prend la forme d'un gain entre 0 et 1.
+
+   Les paramètres a, d et s doivent-être tels que 0.0 < a + d + s < 1.0. Ils
+   expriment la fraction de t correspondant à chacune des quatre phases, la
+   phase d étant la fraction de t définie comme 1 - a - d - s.
+
+   Le paramètre s_level est le niveau de la phase S, entre 0 et 1 donc.
+
+ *)
+
+node adsr_envelope(t : int; a, d, s : float; s_level : float)
+          returns (e : float)
+var c, a_stop, d_stop, s_stop : int;
 let
-  duree_mesure = 2 * period; (* 1 mesure = 8 noires = 4 s à 120 BPM. *)
+  a_stop = int(float(t) *. a);
+  d_stop = a_stop + int(float(t) *. d);
+  s_stop = d_stop + int(float(t) *. s);
+  c = periodic(t);
+  automaton
+    state Attack
+      do e = float(c) /. float(a_stop);
+      unless c >= a_stop continue Decay
+
+    state Decay
+      var f : float;
+      do e = 1.0 -. (1.0 -. s_level) *. f;
+         f = float(c - a_stop) /. float(d_stop - a_stop);
+      unless c >= d_stop continue Sustain
+
+    state Sustain
+      do e = s_level;
+      unless c >= s_stop continue Release
+
+    state Release
+      do e = s_level *. (1.0 -. float(c - s_stop) /. float(t - s_stop));
+      until c + 1 >= t continue Attack
+  end
+tel
+
+node midi_piano<<n : int>>(keys : int^2^n; time : int^n) returns (o : stereo)
+var i, j : int; next : bool; duree_mesure : int; e : float;
+let
+  duree_mesure = 2 * period; (* 1 mesure = 8 noires = 4 sec à 120 BPM. *)
 
   i = periodic(n);
   j = maintain(next, i, 0);
-  o = stereo_mix<<2>>(map<<2>> tone_of_piano_key(keys[>j<]));
+  o = stereo_gain(e, stereo_mix<<2>>(map<<2>> tone_of_piano_key(keys[>j<])));
+  e = adsr_envelope(duree_mesure / time[> j <], 0.3, 0.1, 0.4, 0.5);
 
   automaton
     state Next
