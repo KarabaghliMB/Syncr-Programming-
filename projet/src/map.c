@@ -1,8 +1,8 @@
 #include "map.h"
 
-#include "/usr/include/math.h"
 #include <string.h>
 
+#include "mymath.h"
 #include "cutils.h"
 
 map_t *map;

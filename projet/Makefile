@@ -36,6 +36,7 @@ TARGET=scontest
 .SUFFIXES:
 .PHONY: all clean test
 .PRECIOUS: %.epci %.c %.h
+.SUFFIXES:
 
 all: $(TARGET)
 
@@ -55,18 +56,18 @@ $(TARGET): $(OBJ)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-%_types.c %.c %.h %.epci: %.ept src/mathext.epci src/debug.epci
+%_types.c %.c %.h %.epci &: %.ept src/mathext.epci src/debug.epci src/trace.epci
 	cd `dirname $<` && $(HEPTC) -c -target c `basename $<`
 	N=`dirname $<`/`basename $< .ept`; cp $${N}_c/*.{c,h} src
 
 %.epci: %.epi
 	cd `dirname $<` && $(HEPTC) `basename $<`
 
-src/vehicle.c: src/trace.epci src/globals.epci src/utilities.epci src/control.epci
-src/utilities.c: src/trace.epci src/globals.epci
-src/control.c: src/trace.epci src/globals.epci src/utilities.epci
-src/city.c: src/trace.epci src/globals.epci src/utilities.epci src/vehicle.epci src/map.epci
-src/map.epci: src/trace.epci src/map.epi src/globals.epci
-src/challenge.epci: src/trace.epci src/vehicle.epci src/city.epci src/map.epi
-src/main.o src/map.o: src/trace.epci src/globals.epci
-src/simulation_loop.o: src/trace.epci src/globals.epci src/challenge.epci
+src/vehicle.epci: src/globals.epci src/utilities.epci src/control.epci
+src/utilities.epci: src/globals.epci
+src/control.epci: src/globals.epci src/utilities.epci
+src/city.epci: src/globals.epci src/utilities.epci src/vehicle.epci src/map.epci
+src/map.epci: src/map.epi src/globals.epci
+src/challenge.epci: src/vehicle.epci src/city.epci src/map.epi
+src/main.o src/map.o: src/globals.epci
+src/simulation_loop.o: src/globals.epci src/challenge.epci

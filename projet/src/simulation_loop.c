@@ -3,9 +3,9 @@
 
 #include "simulation_loop.h"
 
-#include "/usr/include/math.h"
 #include <SDL.h>
 
+#include "mymath.h"
 #include "challenge.h"
 #include "cutils.h"
 #include "map.h"

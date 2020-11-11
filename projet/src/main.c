@@ -22,11 +22,11 @@ void usage() {
   fprintf(stderr, "  -w              Run in headless mode\n");
   fprintf(stderr, "  -m <ticks>      Run at most <ticks> synchronous steps\n");
   fprintf(stderr, "  -h              Display this message\n");
-  fprintf(stderr, "  -q              Disable audio\n");
+  fprintf(stderr, "  -a              Enable audio\n");
 }
 
 int main(int argc, char **argv) {
-  bool show_guide = true, headless = false, audio = true;
+  bool show_guide = true, headless = false, audio = false;
   int initial_top = false, opt;
   char *log_filename = NULL;
   size_t max_synchronous_steps = 0;
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   hept_trace_init();
 
   /* Parse command line. */
-  while ((opt = getopt(argc, argv, "vgtf:o:wm:hq")) != -1) {
+  while ((opt = getopt(argc, argv, "vgtf:o:wm:ha")) != -1) {
     switch (opt) {
     case 'v':
       log_set_verbosity_level(LOG_DEBUG);
@@ -69,8 +69,8 @@ int main(int argc, char **argv) {
       max_synchronous_steps = atoi(optarg);
       break;
 
-    case 'q':
-      audio = false;
+    case 'a':
+      audio = true;
       break;
 
     default:
