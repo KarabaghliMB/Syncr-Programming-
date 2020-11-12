@@ -51,14 +51,14 @@ test: $(TARGET)
 	./$< -o logs.txt assets/00.map
 
 $(TARGET): $(OBJ)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $^ $(LDFLAGS) -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-%_types.c %.c %.h %.epci &: %.ept src/mathext.epci src/debug.epci src/trace.epci
+%_types.c %.c %.h %.epci : %.ept src/mathext.epci src/debug.epci src/trace.epci
 	cd `dirname $<` && $(HEPTC) -c -target c `basename $<`
-	N=`dirname $<`/`basename $< .ept`; cp $${N}_c/*.{c,h} src
+	cp $(foreach ext,c h,$(basename $<)_c/*.$(ext)) src
 
 %.epci: %.epi
 	cd `dirname $<` && $(HEPTC) `basename $<`
