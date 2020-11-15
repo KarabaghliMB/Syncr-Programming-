@@ -31,3 +31,6 @@ Ce fichier contient le journal du cours. Il fait référence aux
   On a couvert la sous-section "itérateurs" de la section des notes de cours qui
   concerne les tableaux. Ensuite, on a discuté de synthèse audio en Heptagon,
   cf. le sous-dossier [[file:audio/][audio]].
+* Cours 07 <2020-11-09>
+  On a discuté du projet, dont le code et le sujet peuvent être trouvés dans le
+  répertoire [[file:../projet/][projet]].

@@ -1,6 +1,6 @@
 # Synthèse sonore élémentaire en Heptagon
 
-Ce fichier contient quelques noeuds Heptagon élementaires qui produisent du son.
+Ce dossier contient quelques noeuds Heptagon élementaires qui produisent du son.
 
 Il utilise les bibliothèques SDL2 et sndfile. Elles doivent être installées via
 le gestionnaire de paquet de votre système d'exploitation (`apt-get` sous
