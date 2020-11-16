@@ -149,7 +149,7 @@ fun mat_rot(alpha : float) returns (res : float^2^2)
 var si, co : float;
 let
   si = Mathext.sin(alpha *. (pi /. 180.0));
-  co = Mathext.sin(alpha *. (pi /. 180.0));
+  co = Mathext.cos(alpha *. (pi /. 180.0));
   res = [[co, -. si], [-. si, co]];
 tel
 
