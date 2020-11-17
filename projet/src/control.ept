@@ -1,9 +1,18 @@
 open Globals
 
+node move_forward(sens : sensors; speed : float)
+     	returns (rspeed : wheels; finished : bool)
+let
+  rspeed = { left = speed; right = speed };
+  finished = false;
+tel
 
 node controller(sens : sensors; iti : itielts)
        returns (rspeed : wheels; arriving : bool)
+(*var rc : color;*)
 let
-  rspeed = { left = 0.0; right = 0.0 };
-  arriving = false;
+  (*rc = sens.s_road;*)
+  (*rspeed = { left = 250.0; right = 250.0 };
+  arriving = false;*)
+  (rspeed, arriving) = move_forward(sens, 250.0);
 tel
