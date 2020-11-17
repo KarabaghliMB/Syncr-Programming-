@@ -42,7 +42,7 @@ all: $(TARGET)
 
 clean:
 	rm -f $(OBJ) $(TARGET)
-	echo $(foreach ext, mls obc epci epo log, $(wildcard src/*.$(ext)))
+	rm -f $(foreach ext, mls obc epci epo log, $(wildcard src/*.$(ext)))
 	rm -rf src/*_c
 	rm -f $(subst .o,.c,$(HEPT_OBJ))
 	rm -f $(subst .o,.h,$(HEPT_OBJ))
@@ -68,6 +68,6 @@ src/utilities.epci: src/globals.epci
 src/control.epci: src/globals.epci src/utilities.epci
 src/city.epci: src/globals.epci src/utilities.epci src/vehicle.epci src/map.epci
 src/map.epci: src/map.epi src/globals.epci
-src/challenge.epci: src/vehicle.epci src/city.epci src/map.epi
+src/challenge.epci: src/vehicle.epci src/city.epci src/map.epci
 src/main.o src/map.o: src/globals.epci
 src/simulation_loop.o: src/globals.epci src/challenge.epci
