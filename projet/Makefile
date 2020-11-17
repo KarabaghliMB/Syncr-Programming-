@@ -42,7 +42,7 @@ all: $(TARGET)
 
 clean:
 	rm -f $(OBJ) $(TARGET)
-	rm -f src/*.{mls,obc,epci,epo,log}
+	echo $(foreach ext, mls obc epci epo log, $(wildcard src/*.$(ext)))
 	rm -rf src/*_c
 	rm -f $(subst .o,.c,$(HEPT_OBJ))
 	rm -f $(subst .o,.h,$(HEPT_OBJ))
