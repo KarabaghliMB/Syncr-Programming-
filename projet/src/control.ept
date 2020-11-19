@@ -1,5 +1,6 @@
 open Globals
 open Utilities
+open Debug
 
 node turn_decoder(sens : sensors)
      	returns (turn : float)
@@ -9,7 +10,9 @@ let
   r = Mathext.float(rc.red);
   g = Mathext.float(rc.green);
   b = Mathext.float(rc.blue);
-  turn = (r -. g)/.(b)
+  turn = (r -. g)/.(b);
+  (*J'arrive pas à uttiliser les fonc de deboggage*)
+  (*d_init();*)
 tel
 
 node move_forward(sens : sensors; speed : float)
@@ -18,8 +21,9 @@ var rc : color; turn : float;
 let
   rc = sens.s_road;
   turn = turn_decoder(sens);
-  rspeed = { left = speed +. (turn *. 100.0);
-  	   right = speed -. (turn *. 100.0) };
+  (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
+  rspeed = { left = speed -. (turn *. 100.0);
+  	   right = speed +. (turn *. 100.0) };
   finished = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
 tel
