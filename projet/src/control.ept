@@ -17,23 +17,28 @@ tel
 
 node move_forward(sens : sensors; speed : float)
      	returns (rspeed : wheels; finished : bool)
-var rc : color; turn : float;
+var rc : color; turn, v_turn, v_max : float;
 let
   rc = sens.s_road;
   turn = turn_decoder(sens);
+  (*Le 83.3 deduit par experimentation?*)
+  v_max = 83.3 *. speed;
+  v_turn = v_max *. (0.50);
   (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
-  rspeed = { left = speed -. (turn *. 100.0);
-  	   right = speed +. (turn *. 100.0) };
+  (*(v_max /. 4) car on ne dois jamais depaser la vitesse de speed -> A debuger: a la base je divisais par 2 mais la voiture allais trop vite pour etre controllee *)
+  rspeed = { left = (v_max /. 4.0) -. (turn *. 100.0);
+  	   right = (v_max /. 4.0) +. (turn *. 100.0) };
   finished = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
 tel
 
 node controller(sens : sensors; iti : itielts)
        returns (rspeed : wheels; arriving : bool)
-(*var rc : color;*)
+var vmax : float; ordre : itielt;
 let
-  (*rc = sens.s_road;*)
-  (*rspeed = { left = 250.0; right = 250.0 };
-  arriving = false;*)
-  (rspeed, arriving) = move_forward(sens, 250.0);
+  (*iti est un tableaux de itielt et pas un seul itielt...*)
+  ordre = iti[0];
+  vmax = ordre.param;
+  (*TODO: debuger, la voiture va toujours à v = 19.99 meme qd je modifie les param de OO.epi*)
+  (rspeed, arriving) = move_forward(sens, vmax);
 tel
