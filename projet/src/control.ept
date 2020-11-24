@@ -25,8 +25,8 @@ let
   (*() = dbg_float("speed = ", speed);*)
   rc = sens.s_road;
   turn = turn_decoder(sens);
-  (*Le 83.3 deduit par experimentation?*)
-  v_max = 83.3 *. speed;
+  (*Le 20.83 a été deduit par experimentation*)
+  v_max = (20.83 *. speed) *. 2.0;
   () = dbg_float("v_max = ", v_max);
   () = dbg(" ");
   v_turn = v_max *. (0.50);
