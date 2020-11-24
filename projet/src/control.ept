@@ -18,13 +18,8 @@ let
   () = dbg_float("bleu = ", b);*)
 tel
 
-
-
-
-
-
 node move_forward(sens : sensors; speed : float)
-     	returns (rspeed : wheels; finished : bool)
+     	returns (rspeed : wheels; etape : bool)
 var rc : color; turn, v_turn, v_max : float;
 let
   (*() = dbg_float("speed = ", speed);*)
@@ -39,29 +34,45 @@ let
   (*(v_max /. 2) car on ne dois jamais depaser la vitesse de speed *)
   rspeed = { left = (v_max)-. (v_turn *. turn);
   	   right = (v_max) +. (v_turn *. turn) };
-  finished = if compare_colors(rc, green) >. 0.9 then true
+  etape = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
 	     
   (*() = dbg_float(" roue droite = ", rspeed.left);
   () = dbg_float(" roue gauche = ", rspeed.right);*)
 tel
 
+node suivre_ordre(sens : sensors; ordre : itielt)
+     	returns (rspeed : wheels; etape : bool ; arriving : bool)
+var vmax : float;
+let
+  vmax = ordre.param;
+  switch ordre.act
+  | Stop do arriving = true;
+    	    rspeed = {left = 0.0; right = 0.0};
+	    etape = true;
+  | Turn do arriving = false;
+    	    (*TODO*)
+    	    (rspeed, etape) = ({left = 1000.0; right = 1000.0}, true);
+  | Go do arriving = false;
+       	  (rspeed, etape) = move_forward(sens, vmax);
+  end;
+  () = dbg_bool("arriving = ", arriving);
+tel
+
 node controller(sens : sensors; iti : itielts)
        returns (rspeed : wheels; arriving : bool)
-var vmax : float; last cpt : int = 0; ordre : itielt;
+var etape : bool; last cpt : int = 0; ordre : itielt;
 let
   (*iti est un tableaux de itielt et pas un seul itielt...*)
   automaton
 	state Avancer
 	      do ordre = iti.[cpt] default {act = Go; param = 0.0};
-	         vmax = ordre.param;
-(*Pour modif la vitesse lu c'est le .map qu'il faut modifier pas le epi*)
-       	     	 (rspeed, arriving) = move_forward(sens, vmax);
-	      until arriving then Incr
+       	     	 (rspeed, etape, arriving) = suivre_ordre(sens, ordre);
+	      until etape then Incr
 	state Incr
 	      do cpt = last cpt + 1;
 	      ordre = {act = Go; param = 0.0};
-	      vmax = 0.0;
+	      etape = false;
 	      rspeed = {left = 0.0; right = 0.0};
 	      arriving = false;
 	      until true then Avancer
