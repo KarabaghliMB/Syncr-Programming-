@@ -26,19 +26,19 @@ let
   rc = sens.s_road;
   turn = turn_decoder(sens);
   (*Le 20.83 a été deduit par experimentation*)
-  v_max = (20.83 *. speed) *. 2.0;
-  () = dbg_float("v_max = ", v_max);
-  () = dbg(" ");
-  v_turn = v_max *. (0.50);
+  v_max = 20.83 *. speed;
+  (*() = dbg_float("v_max = ", v_max);
+  () = dbg(" ");*)
+  v_turn = v_max *. (0.25);
   (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
   (*(v_max /. 2) car on ne dois jamais depaser la vitesse de speed *)
-  rspeed = { left = (v_max /. 2.0)-. (v_turn *. turn);
-  	   right = (v_max /. 2.0) +. (v_turn *. turn) };
+  rspeed = { left = (v_max)-. (v_turn *. turn);
+  	   right = (v_max) +. (v_turn *. turn) };
   finished = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
 	     
-  () = dbg_float(" roue droite = ", rspeed.left);
-  () = dbg_float(" roue gauche = ", rspeed.right);
+  (*() = dbg_float(" roue droite = ", rspeed.left);
+  () = dbg_float(" roue gauche = ", rspeed.right);*)
 tel
 
 node controller(sens : sensors; iti : itielts)
