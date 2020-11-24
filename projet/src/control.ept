@@ -11,25 +11,34 @@ let
   g = Mathext.float(rc.green);
   b = Mathext.float(rc.blue);
   turn = (r -. g)/.(b);
-  (*J'arrive pas à uttiliser les fonc de deboggage*)
-  (*d_init();*)
+  (*Exemple d'uttilisation des fonctions de deboggage*)
+  (*() = dbg("ping \n");
+  () = dbg_float("rouge = ", r);
+  () = dbg_float("vert = ", g);
+  () = dbg_float("bleu = ", b);*)
 tel
 
 node move_forward(sens : sensors; speed : float)
      	returns (rspeed : wheels; finished : bool)
 var rc : color; turn, v_turn, v_max : float;
 let
+  (*() = dbg_float("speed = ", speed);*)
   rc = sens.s_road;
   turn = turn_decoder(sens);
   (*Le 83.3 deduit par experimentation?*)
   v_max = 83.3 *. speed;
+  () = dbg_float("v_max = ", v_max);
+  () = dbg(" ");
   v_turn = v_max *. (0.50);
   (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
-  (*(v_max /. 4) car on ne dois jamais depaser la vitesse de speed -> A debuger: a la base je divisais par 2 mais la voiture allais trop vite pour etre controllee *)
-  rspeed = { left = (v_max /. 4.0) -. (turn *. 100.0);
-  	   right = (v_max /. 4.0) +. (turn *. 100.0) };
+  (*(v_max /. 2) car on ne dois jamais depaser la vitesse de speed *)
+  rspeed = { left = (v_max /. 2.0)-. (v_turn *. turn);
+  	   right = (v_max /. 2.0) +. (v_turn *. turn) };
   finished = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
+	     
+  () = dbg_float(" roue droite = ", rspeed.left);
+  () = dbg_float(" roue gauche = ", rspeed.right);
 tel
 
 node controller(sens : sensors; iti : itielts)
@@ -39,6 +48,6 @@ let
   (*iti est un tableaux de itielt et pas un seul itielt...*)
   ordre = iti[0];
   vmax = ordre.param;
-  (*TODO: debuger, la voiture va toujours à v = 19.99 meme qd je modifie les param de OO.epi*)
+  (*Pour modifier la vitesse lu c'est le .map qu'il faut modifier pas le epi*)
   (rspeed, arriving) = move_forward(sens, vmax);
 tel
