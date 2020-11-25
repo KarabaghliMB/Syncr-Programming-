@@ -29,7 +29,7 @@ let
   v_max = 20.83 *. speed;
   (*() = dbg_float("v_max = ", v_max);
   () = dbg(" ");*)
-  v_turn = v_max *. (0.25);
+  v_turn = v_max *. (0.02);
   (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
   rspeed = { left = (v_max)-. (v_turn *. turn);
   	   right = (v_max) +. (v_turn *. turn) };
@@ -57,7 +57,7 @@ let
 	state Avancer
    (*On avance de 3 pas pour que le véhicule dépase la marque d'arrivée*)
 	      do rspeed = {left = 75.0; right = 75.0};
-	         () = dbg("Rotation fini, on avance");
+	         (*() = dbg("Rotation fini, on avance");*)
 	      	 pas = last pas + 1;
 		 etape = false;
 	      until (pas >= 100) then Fini
