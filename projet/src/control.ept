@@ -31,7 +31,6 @@ let
   () = dbg(" ");*)
   v_turn = v_max *. (0.25);
   (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
-  (*(v_max /. 2) car on ne dois jamais depaser la vitesse de speed *)
   rspeed = { left = (v_max)-. (v_turn *. turn);
   	   right = (v_max) +. (v_turn *. turn) };
   etape = if compare_colors(rc, green) >. 0.9 then true
@@ -39,6 +38,28 @@ let
 	     
   (*() = dbg_float(" roue droite = ", rspeed.left);
   () = dbg_float(" roue gauche = ", rspeed.right);*)
+tel
+
+node rotate(angle : float)
+     	returns (rspeed : wheels; etape : bool)
+var last tps : float = 0.0; t_voulue : float;
+let
+  (*Kv = 65.22 a été déduit experimentalement*)
+  t_voulue = angle /. (86.96 *. 75.0 *. timestep);
+  (*() = dbg_float("tps voulue: ", t_voulue);*)
+  automaton
+	state Rot
+	      do rspeed = {left = -.75.0; right = 75.0};
+	      	 etape = false;
+		 tps = last tps +. timestep;
+	      until (tps >=. t_voulue) then Fini
+	state Fini
+	      do rspeed = {left = 0.0; right = 0.0};
+	         etape = true;
+		 tps = 0.0;
+	      until true then Rot
+  end
+  (*rspeed = {left = -.75.0; right = 75.0};*)
 tel
 
 node suivre_ordre(sens : sensors; ordre : itielt)
@@ -50,13 +71,16 @@ let
   | Stop do arriving = true;
     	    rspeed = {left = 0.0; right = 0.0};
 	    etape = true;
+	    (*() = dbg("STOP");*)
   | Turn do arriving = false;
-    	    (*TODO*)
-    	    (rspeed, etape) = ({left = 1000.0; right = 1000.0}, true);
+    	    (rspeed, etape) = rotate(ordre.param);
+	    (*() = dbg("Turn");*)
   | Go do arriving = false;
        	  (rspeed, etape) = move_forward(sens, vmax);
+	  (*() = dbg("GO");*)
   end;
-  () = dbg_bool("arriving = ", arriving);
+  (*() = dbg_float("param = ", ordre.param);
+  () = dbg_bool("arriving = ", arriving);*)
 tel
 
 node controller(sens : sensors; iti : itielts)
