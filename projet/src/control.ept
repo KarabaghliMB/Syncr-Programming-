@@ -18,9 +18,20 @@ let
   () = dbg_float("bleu = ", b);*)
 tel
 
+node reg_PID(y : float; r : float; k_p : float; k_i : float; k_d : float)
+     returns (u : float)
+var e, p, i, d : float;
+let
+  e = y -. r;
+  p = k_p *. e;
+  i = k_i *. integrator(e, 0.1, y);
+  d = k_d *. derivative(e, 0.1);
+  u = p +. i +. d;
+tel
+
 node move_forward(sens : sensors; speed : float)
      	returns (rspeed : wheels; etape : bool)
-var rc : color; turn, v_turn, v_max : float;
+var rc : color; turn, v_turn, v_max, n_turn : float;
 let
   (*() = dbg_float("speed = ", speed);*)
   rc = sens.s_road;
@@ -30,14 +41,15 @@ let
   (*() = dbg_float("v_max = ", v_max);
   () = dbg(" ");*)
   v_turn = v_max *. (0.02);
+  n_turn = reg_PID(turn, v_max, 0.1, 0.1, 0.1);
   (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
-  rspeed = { left = (v_max)-. (v_turn *. turn);
-  	   right = (v_max) +. (v_turn *. turn) };
+  rspeed = { left = (v_max)-. (v_turn *. n_turn);
+  	   right = (v_max) +. (v_turn *. n_turn) };
   etape = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
 	     
-  (*() = dbg_float(" roue droite = ", rspeed.left);
-  () = dbg_float(" roue gauche = ", rspeed.right);*)
+  () = dbg_float(" roue droite = ", rspeed.left);
+  () = dbg_float(" roue gauche = ", rspeed.right);
 tel
 
 node rotate(angle : float)
