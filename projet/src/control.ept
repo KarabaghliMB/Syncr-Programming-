@@ -44,14 +44,16 @@ let
   () = dbg(" ");*)
   v_turn = v_max *. (0.02);
   n_turn = reg_PID(turn, 0.0, 0.1, 0.1, 0.1);
-  (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
-  rspeed = { left = (v_max)-. (v_turn *. n_turn);
-  	   right = (v_max) +. (v_turn *. n_turn) };
   etape = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
+  (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
+  rspeed = if etape then {left = 0.0; right = 0.0}
+  	   else{ left = (v_max)-. (v_turn *. n_turn);
+  	   	 right = (v_max) +. (v_turn *. n_turn) };
 	     
   (*() = dbg_float(" roue droite = ", rspeed.left);
-  () = dbg_float(" roue gauche = ", rspeed.right);*)
+  () = dbg_float(" roue gauche = ", rspeed.right);
+  () = dbg_bool(" etape = ", etape);*)
 tel
 
 node rotate(angle : float)
@@ -69,12 +71,12 @@ let
 		 (*() = dbg_float("tps ecoule = ", tps);*)
 	      until (tps >=. t_voulue) then Avancer
 	state Avancer
-   (*On avance de 3 pas pour que le véhicule dépase la marque d'arrivée*)
-	      do rspeed = {left = 75.0; right = 75.0};
+   (*On avance de 40 pas pour que le véhicule dépase la marque d'arrivée*)
+	      do rspeed = {left = 170.0; right = 170.0};
 	         (*() = dbg("Rotation fini, on avance");*)
 	      	 pas = last pas + 1;
 		 etape = false;
-	      until (pas >= 100) then Fini
+	      until (pas >= 40) then Fini
 	state Fini
 	      do rspeed = {left = 0.0; right = 0.0};
 	         etape = true;
