@@ -18,6 +18,18 @@ let
   () = dbg_float("bleu = ", b);*)
 tel
 
+(*ferra avancer la voiture jusqu'à ce qu'elle dépasse la marque au sol*)
+node depasse_marque(sens : sensors; speed : float)
+     returns (rspeed : wheels; fini : bool)
+var rc : color; v_max : float;
+let
+  rc = sens.s_road;
+  v_max = 20.83 *. speed;
+  fini = compare_colors(rc, green) <=. 0.9;
+  rspeed = if fini then {left = 0.0 ; right = 0.0}
+  	   else {left = v_max ; right = v_max};
+tel
+
 node reg_PID(turn : float; r : float; k_p : float; k_i : float; k_d : float)
      returns (u : float)
 var y, e, p, i, d : float;
@@ -109,7 +121,7 @@ tel
 
 node suivre_ordre(sens : sensors; ordre : itielt)
      	returns (rspeed : wheels; etape : bool ; arriving : bool)
-var vmax : float;
+var vmax : float; last fini : bool;
 let
   vmax = ordre.param;
   switch ordre.act
@@ -121,8 +133,17 @@ let
     	    (rspeed, etape) = rotate(ordre.param);
 	    (*() = dbg("Turn");*)
   | Go do arriving = false;
-       	  (rspeed, etape) = move_forward(sens, vmax);
-	  (*() = dbg("GO");*)
+       	  (*() = dbg("GO");*)
+       	  automaton
+		state Depasse
+		      do etape = false;
+		      	 (rspeed, fini) = depasse_marque(sens, vmax);
+			 (*() = dbg("On attend de depasser la ligne verte");*)
+		      until fini then Do_GO
+		state Do_GO
+       	  	      do (rspeed, etape) = move_forward(sens, vmax);
+		      until etape then Depasse
+	  end;
   end;
   (*() = dbg_float("param = ", ordre.param);
   () = dbg_bool("arriving = ", arriving);*)
