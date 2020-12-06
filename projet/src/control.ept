@@ -31,9 +31,21 @@ let
   u = p +. i +. d;
 tel
 
+node color_feu(sens : sensors) returns (rouge : bool)
+var fc : color;
+let
+  fc = sens.s_front;
+  (*() = dbg_int("r = ", fc.red);
+  () = dbg_int("g = ", fc.green);
+  () = dbg_int("b = ", fc.blue);*)
+  rouge = if compare_colors(fc, red) >. 0.9 then true
+  	  else false;
+  (*() = dbg_float("vert a: ", compare_colors(fc, red));*)
+tel
+
 node move_forward(sens : sensors; speed : float)
      	returns (rspeed : wheels; etape : bool)
-var rc : color; turn, v_turn, v_max, n_turn : float;
+var rc : color; turn, v_turn, v_max, n_turn : float; rouge : bool;
 let
   (*() = dbg_float("speed = ", speed);*)
   rc = sens.s_road;
@@ -46,8 +58,11 @@ let
   n_turn = reg_PID(turn, 0.0, 0.1, 0.1, 0.1);
   etape = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
+  rouge = if compare_colors(rc, red) >. 0.9 then color_feu(sens)
+  	     else false;
+  (*() = dbg_bool("Feux rouge = ", rouge);*)
   (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
-  rspeed = if etape then {left = 0.0; right = 0.0}
+  rspeed = if (etape or rouge) then {left = 0.0; right = 0.0}
   	   else{ left = (v_max)-. (v_turn *. n_turn);
   	   	 right = (v_max) +. (v_turn *. n_turn) };
 	     
