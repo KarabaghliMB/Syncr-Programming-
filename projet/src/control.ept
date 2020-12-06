@@ -73,10 +73,13 @@ tel
 
 node rotate(angle : float)
      	returns (rspeed : wheels; etape : bool)
-var last tps : float = 0.0; t_voulue : float; last pas : int = 0;
+var last tps : float = 0.0; t_voulue, angle_ef : float; last pas : int = 0;
 let
+  (*On definit un "angle effectif" pour les cas où l'angle donné est négatif*)
+  angle_ef = if (angle >=. 0.0) then angle
+  	      else (360.0 +. angle);
   (*Kv = 86.96 a été déduit experimentalement*)
-  t_voulue = angle /. (86.96 *. 75.0 *. timestep);
+  t_voulue = angle_ef /. (86.96 *. 75.0 *. timestep);
   (*() = dbg_float("tps voulue: ", t_voulue);*)
   automaton
 	state Rot
