@@ -61,20 +61,22 @@ var rc : color; turn, v_turn, v_max, n_turn : float; rouge, feux: bool; last fin
 let
   (*() = dbg_float("speed = ", speed);*)
   rc = sens.s_road;
-  turn = turn_decoder(sens);
   (*Le 20.83 a été deduit par experimentation*)
   v_max = 20.83 *. speed;
   (*() = dbg_float("v_max = ", v_max);
   () = dbg(" ");*)
   v_turn = v_max *. (0.02);
-  n_turn = reg_PID(turn, 0.0, 0.2, 0.1, 0.2);
   etape = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
   feux = compare_colors(rc, red) >. 0.9;
   rouge = if feux then color_feu(sens)
   	     else false;
   (*() = dbg_bool("Feux rouge = ", rouge);*)
-(*  automaton
+
+ turn = if (not feux) then turn_decoder(sens)
+      	else 0.0;
+ n_turn = reg_PID(turn, 0.0, 0.2, 0.1, 0.2);
+  automaton
 	state Forward
 (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
 	      do rspeed = if (etape or rouge) then {left = 0.0; right = 0.0}
@@ -84,17 +86,20 @@ let
 	      until feux then Signalisation
 	state Signalisation
 	      do (rspeed, fini) = if rouge then ({left = 0.0; right = 0.0}, false)
-		 	  	  else depasse_marque(sens, 5.0, red);
+		 	  	  else depasse_marque(sens, v_max, red);
 		() = dbg("Signalisation");
 	      until fini then Forward
-  end;*)
+  end;
   
-  (rspeed, fini) = if (etape or rouge) then ({left = 0.0; right = 0.0}, false)
+  (*(rspeed, fini) = if (etape or rouge) then ({left = 0.0; right = 0.0}, false)
   	   else if (feux and not rouge) then depasse_marque(sens, 5.0, red)
 (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
   	   else({ left = (v_max)-. (v_turn *. n_turn);
-  	   	 right = (v_max) +. (v_turn *. n_turn) }, false);
+  	   	 right = (v_max) +. (v_turn *. n_turn) }, false);*)
+  (*(rspeed, fini) = ({left = 150.0; right = 150.0}, false);*)
+  (*La carte peut phisiquement accepter que la voiture dépasse le feux...*)
 
+  () = dbg_float("turn = ", turn);
   () = dbg_float(" roue droite = ", rspeed.left);
   () = dbg_float(" roue gauche = ", rspeed.right);
   () = dbg_bool(" etape = ", etape);
