@@ -17,6 +17,38 @@ let
   () = dbg_float("vert = ", g);
   () = dbg_float("bleu = ", b);*)
 tel
+(*Ic j'ai ajouté un noeud pour améliorer la vitesse de move au fon par la ralentissage en les obstacles*)
+
+node move_profd_avecRalentisseur(sens : sensors; speed : float)
+     	retourner_ralens (rspeed : wheels; etape : bool)
+var rc : color; tourner_ralen, Vitesse_obstacle_tourn, Vitesse_Ralentir, n_tourner_ralen : float; rouge, feux: bool; last arrived : bool;
+let
+  (*ameliration move pour ralentir en obstacles*)
+  rc = sens.s_road;
+  Vitesse_Ralentir = 20.83 *. speed;
+  Vitesse_obstacle_tourn = Vitesse_Ralentir *. (0.02);
+  etape = if compare_colors(rc, green) >. 0.9 then true
+  	     else false;
+  feux = compare_colors(rc, red) >. 0.9;
+  rouge = if feux then color_feu(sens)
+  	     else false;
+ tourner_ralen = if (not feux) then tourner_ralen_decoder(sens)
+      	else 0.0;
+ n_tourner_ralen = reg_PID(tourner_ralen, 0.0, 0.2, 0.1, 0.2);
+  automaton
+	state Forward
+(*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
+	      do rspeed = if (etape or rouge) then {left = 0.0; right = 0.0}
+  	      	 	  else{ left = (Vitesse_Ralentir)-. (Vitesse_obstacle_tourn *. n_tourner_ralen);
+  	   	 	  	right = (Vitesse_Ralentir) +. (Vitesse_obstacle_tourn *. n_tourner_ralen) };
+		(*() = dbg("Forward");*)
+	      until feux then Signalisation
+	state Signalisation
+	      do (rspeed, arrived) = if rouge then ({left = 0.0; right = 0.0}, false)
+		 	  	  else depasse_marque(sens, Vitesse_Ralentir, red);
+	      until arrived then Forward
+  end;
+tel
 
 (*ferra avancer la voiture jusqu'à ce qu'elle dépasse la marque au sol*)
 node depasse_marque(sens : sensors; speed : float; obj : color)
@@ -151,7 +183,7 @@ let
 			 (*() = dbg("On attend de depasser la ligne verte");*)
 		      until fini then Do_GO
 		state Do_GO
-       	  	      do (rspeed, etape) = move_forward(sens, vmax);
+       	  	      do (rspeed, etape) = move_profd_avecRalentisseur(sens, vmax);
 		      until etape then Depasse
 	  end;
   end;
