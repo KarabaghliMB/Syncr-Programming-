@@ -67,7 +67,7 @@ let
   (*() = dbg_float("v_max = ", v_max);
   () = dbg(" ");*)
   v_turn = v_max *. (0.02);
-  n_turn = reg_PID(turn, 0.0, 0.1, 0.1, 0.1);
+  n_turn = reg_PID(turn, 0.0, 0.2, 0.1, 0.2);
   etape = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
   rouge = if compare_colors(rc, red) >. 0.9 then color_feu(sens)
