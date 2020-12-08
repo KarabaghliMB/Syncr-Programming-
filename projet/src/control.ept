@@ -19,13 +19,13 @@ let
 tel
 
 (*ferra avancer la voiture jusqu'à ce qu'elle dépasse la marque au sol*)
-node depasse_marque(sens : sensors; speed : float)
+node depasse_marque(sens : sensors; speed : float; obj : color)
      returns (rspeed : wheels; fini : bool)
 var rc : color; v_max : float;
 let
   rc = sens.s_road;
   v_max = 20.83 *. speed;
-  fini = compare_colors(rc, green) <=. 0.9;
+  fini = compare_colors(rc, obj) <=. 0.9;
   rspeed = if fini then {left = 0.0 ; right = 0.0}
   	   else {left = v_max ; right = v_max};
 tel
@@ -57,7 +57,7 @@ tel
 
 node move_forward(sens : sensors; speed : float)
      	returns (rspeed : wheels; etape : bool)
-var rc : color; turn, v_turn, v_max, n_turn : float; rouge : bool;
+var rc : color; turn, v_turn, v_max, n_turn : float; rouge, feux: bool; last fini : bool;
 let
   (*() = dbg_float("speed = ", speed);*)
   rc = sens.s_road;
@@ -70,17 +70,34 @@ let
   n_turn = reg_PID(turn, 0.0, 0.2, 0.1, 0.2);
   etape = if compare_colors(rc, green) >. 0.9 then true
   	     else false;
-  rouge = if compare_colors(rc, red) >. 0.9 then color_feu(sens)
+  feux = compare_colors(rc, red) >. 0.9;
+  rouge = if feux then color_feu(sens)
   	     else false;
   (*() = dbg_bool("Feux rouge = ", rouge);*)
-  (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
-  rspeed = if (etape or rouge) then {left = 0.0; right = 0.0}
-  	   else{ left = (v_max)-. (v_turn *. n_turn);
-  	   	 right = (v_max) +. (v_turn *. n_turn) };
-	     
-  (*() = dbg_float(" roue droite = ", rspeed.left);
+(*  automaton
+	state Forward
+(*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
+	      do rspeed = if (etape or rouge) then {left = 0.0; right = 0.0}
+  	      	 	  else{ left = (v_max)-. (v_turn *. n_turn);
+  	   	 	  	right = (v_max) +. (v_turn *. n_turn) };
+		() = dbg("Forward");
+	      until feux then Signalisation
+	state Signalisation
+	      do (rspeed, fini) = if rouge then ({left = 0.0; right = 0.0}, false)
+		 	  	  else depasse_marque(sens, 5.0, red);
+		() = dbg("Signalisation");
+	      until fini then Forward
+  end;*)
+  
+  (rspeed, fini) = if (etape or rouge) then ({left = 0.0; right = 0.0}, false)
+  	   else if (feux and not rouge) then depasse_marque(sens, 5.0, red)
+(*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
+  	   else({ left = (v_max)-. (v_turn *. n_turn);
+  	   	 right = (v_max) +. (v_turn *. n_turn) }, false);
+
+  () = dbg_float(" roue droite = ", rspeed.left);
   () = dbg_float(" roue gauche = ", rspeed.right);
-  () = dbg_bool(" etape = ", etape);*)
+  () = dbg_bool(" etape = ", etape);
 tel
 
 node rotate(angle : float ; sens : sensors)
@@ -97,7 +114,7 @@ let
   automaton
   	state Avancer
 	      do etape = false;
-	      	 (rspeed, fini) = depasse_marque(sens, 10.0);
+	      	 (rspeed, fini) = depasse_marque(sens, 10.0, green);
 	      until fini then Rot
 	state Rot
 	      do rspeed = if positif then {left = -.75.0; right = 75.0}
@@ -133,7 +150,7 @@ let
        	  automaton
 		state Depasse
 		      do etape = false;
-		      	 (rspeed, fini) = depasse_marque(sens, vmax);
+		      	 (rspeed, fini) = depasse_marque(sens, vmax, green);
 			 (*() = dbg("On attend de depasser la ligne verte");*)
 		      until fini then Do_GO
 		state Do_GO
