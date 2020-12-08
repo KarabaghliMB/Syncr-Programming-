@@ -82,27 +82,19 @@ let
 	      do rspeed = if (etape or rouge) then {left = 0.0; right = 0.0}
   	      	 	  else{ left = (v_max)-. (v_turn *. n_turn);
   	   	 	  	right = (v_max) +. (v_turn *. n_turn) };
-		() = dbg("Forward");
+		(*() = dbg("Forward");*)
 	      until feux then Signalisation
 	state Signalisation
 	      do (rspeed, fini) = if rouge then ({left = 0.0; right = 0.0}, false)
 		 	  	  else depasse_marque(sens, v_max, red);
-		() = dbg("Signalisation");
+		(*() = dbg("Signalisation");*)
 	      until fini then Forward
   end;
-  
-  (*(rspeed, fini) = if (etape or rouge) then ({left = 0.0; right = 0.0}, false)
-  	   else if (feux and not rouge) then depasse_marque(sens, 5.0, red)
-(*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
-  	   else({ left = (v_max)-. (v_turn *. n_turn);
-  	   	 right = (v_max) +. (v_turn *. n_turn) }, false);*)
-  (*(rspeed, fini) = ({left = 150.0; right = 150.0}, false);*)
-  (*La carte peut phisiquement accepter que la voiture dépasse le feux...*)
 
-  () = dbg_float("turn = ", turn);
+  (*() = dbg_float("turn = ", turn);
   () = dbg_float(" roue droite = ", rspeed.left);
   () = dbg_float(" roue gauche = ", rspeed.right);
-  () = dbg_bool(" etape = ", etape);
+  () = dbg_bool(" etape = ", etape);*)
 tel
 
 node rotate(angle : float ; sens : sensors)
