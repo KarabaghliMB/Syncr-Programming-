@@ -17,7 +17,19 @@ let
   () = dbg_float("vert = ", g);
   () = dbg_float("bleu = ", b);*)
 tel
-
+node Amelioration_reg_PID(turn : float; regulirateur : float; k_p : float; k_i : float; k_d : float)
+     returns (ReturnReg : float)
+var a, b, c, e, d : float;
+let
+  
+  a = (turn *. 180.0) /. pi;
+  (*pour var a reçoit , le variable turn est en Radiant , donc on va le convertir en Degrée *)
+  b = a -. regulirateur;
+  c = k_p *. b;
+  e = k_i *. integrator(b, 0.01, a);
+  d = k_d *. derivative(b, 0.01);
+  ReturnReg = c +. e +. d;
+tel
 (*ferra avancer la voiture jusqu'à ce qu'elle dépasse la marque au sol*)
 node depasse_marque(sens : sensors; speed : float; obj : color)
      returns (rspeed : wheels; fini : bool)
@@ -75,7 +87,7 @@ let
 
  turn = if (not feux) then turn_decoder(sens)
       	else 0.0;
- n_turn = reg_PID(turn, 0.0, 0.2, 0.1, 0.2);
+ n_turn = Amelioration_reg_PID(turn, 0.0, 0.2, 0.1, 0.2);
   automaton
 	state Forward
 (*Note c est le contraire de ce q indiquai la methodologie conseille mais ça marhe...*)
